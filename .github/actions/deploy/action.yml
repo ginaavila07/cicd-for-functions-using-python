@@ -1,0 +1,41 @@
+name: Deploy Azure Function
+description: Authenticate and deploy Azure Function using private Blob Storage
+
+runs:
+  using: composite
+  steps:
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ vars.AZURE_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID }}
+        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Build and Deploy Azure Function
+      shell: bash
+      run: |
+        zip -r functionapp.zip function_app.py host.json requirements.txt .python_packages
+
+        az storage blob upload \
+          --account-name cicdfunctionsrg99c3 \
+          --container-name function-packages \
+          --name functionapp.zip \
+          --file functionapp.zip \
+          --auth-mode login \
+          --content-type application/zip \
+          --overwrite true
+
+        az functionapp config appsettings set \
+          --name cicd-functions-vavila \
+          --resource-group cicd-functions-rg \
+          --settings \
+            WEBSITE_RUN_FROM_PACKAGE=https://cicdfunctionsrg99c3.blob.core.windows.net/function-packages/functionapp.zip \
+            WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID=/subscriptions/b022d96f-a31a-4b40-9da4-8a4ae456a039/resourceGroups/cicd-functions-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/cicd-function-reader-identity
+
+        az functionapp restart \
+          --name cicd-functions-vavila \
+          --resource-group cicd-functions-rg
+
+        az rest \
+          --method post \
+          --url "https://management.azure.com/subscriptions/b022d96f-a31a-4b40-9da4-8a4ae456a039/resourceGroups/cicd-functions-rg/providers/Microsoft.Web/sites/cicd-functions-vavila/syncfunctiontriggers?api-version=2016-08-01"
