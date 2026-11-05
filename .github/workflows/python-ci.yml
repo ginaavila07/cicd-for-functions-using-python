@@ -95,6 +95,6 @@ jobs:
 
       - name: Sync Function Triggers
         run: |
-          az rest
-            --method post
+          az rest \
+            --method post \
             --url "https://management.azure.com/subscriptions/b022d96f-a31a-4b40-9da4-8a4ae456a039/resourceGroups/cicd-functions-rg/providers/Microsoft.Web/sites/cicd-functions-vavila/syncfunctiontriggers?api-version=2016-08-01"
