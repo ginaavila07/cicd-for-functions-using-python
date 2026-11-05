@@ -61,3 +61,7 @@ local.settings.json
 .DS_Store
 Thumbs.db
 /meta.json
+
+# Local deployment credentials
+slot-swap-credentials.json
+staging-publish-profile.xml
