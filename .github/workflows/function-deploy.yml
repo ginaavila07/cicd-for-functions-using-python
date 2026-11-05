@@ -61,3 +61,7 @@ jobs:
 
       - name: Deploy Azure Function
         uses: ./.github/actions/deploy
+        with:
+          azure-client-id: ${{ vars.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
