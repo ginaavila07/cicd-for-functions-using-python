@@ -72,6 +72,11 @@ jobs:
 
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
+          az functionapp config appsettings delete \
+            --name cicd-functions-vavila \
+            --resource-group cicd-functions-rg \
+            --setting-names WEBSITE_RUN_FROM_PACKAGE WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID
+
       - name: Run Azure Functions Action
         uses: Azure/functions-action@v1
         with:
