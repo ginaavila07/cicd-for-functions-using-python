@@ -49,16 +49,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Up Python
+      - name: Set Up Python and Build Package
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Build Deployment Package
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --target=".python_packages/lib/site-packages" -r requirements.txt
-          zip -r functionapp.zip function_app.py host.json requirements.txt .python_packages
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -67,8 +61,12 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Upload Package to Azure Storage
+      - name: Build and Deploy Azure Function
         run: |
+          python -m pip install --upgrade pip
+          python -m pip install --target=".python_packages/lib/site-packages" -r requirements.txt
+          zip -r functionapp.zip function_app.py host.json requirements.txt .python_packages
+
           az storage blob upload \
             --account-name cicdfunctionsrg99c3 \
             --container-name function-packages \
@@ -78,8 +76,6 @@ jobs:
             --content-type application/zip \
             --overwrite true
 
-      - name: Configure Function App Package
-        run: |
           az functionapp config appsettings set \
             --name cicd-functions-vavila \
             --resource-group cicd-functions-rg \
@@ -87,14 +83,10 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE=https://cicdfunctionsrg99c3.blob.core.windows.net/function-packages/functionapp.zip \
               WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID=/subscriptions/b022d96f-a31a-4b40-9da4-8a4ae456a039/resourceGroups/cicd-functions-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/cicd-function-reader-identity
 
-      - name: Restart Function App
-        run: |
           az functionapp restart \
             --name cicd-functions-vavila \
             --resource-group cicd-functions-rg
 
-      - name: Sync Function Triggers
-        run: |
           az rest \
             --method post \
             --url "https://management.azure.com/subscriptions/b022d96f-a31a-4b40-9da4-8a4ae456a039/resourceGroups/cicd-functions-rg/providers/Microsoft.Web/sites/cicd-functions-vavila/syncfunctiontriggers?api-version=2016-08-01"
