@@ -65,3 +65,10 @@ jobs:
           azure-client-id: ${{ vars.AZURE_CLIENT_ID }}
           azure-tenant-id: ${{ vars.AZURE_TENANT_ID }}
           azure-subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Azure Functions Action
+        if: ${{ vars.ENABLE_FUNCTIONS_ACTION == 'true' }}
+        uses: Azure/functions-action@v1
+        with:
+          app-name: cicd-functions-vavila
+          package: .
