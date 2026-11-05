@@ -62,13 +62,25 @@ def analyze_number(num):
             divisor_sum += i
 
     is_perfect = divisor_sum == num
+
+
+    # TODO 7: Check whether the number is triangular
+    triangular_sum = 0
+    i = 1
+
+    while triangular_sum < num:
+        triangular_sum += i
+        i += 1
+
+    is_triangular = triangular_sum == num
     # TODO 6: Replace default values below with the results of the calculations from
     # TODOs 2-5.
     response = {
         "sum_of_digits": digit_sum,
         "is_prime": is_prime,
         "is_odd": is_odd,
-        "is_perfect": is_perfect
+        "is_perfect": is_perfect,
+        "is_triangular": is_triangular
     }
 
     # response = {
