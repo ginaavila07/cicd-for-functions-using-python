@@ -11,7 +11,8 @@ class TestAnalyzeNumber(unittest.TestCase):
                 "sum_of_digits": 10,
                 "is_prime": False,
                 "is_odd": False,
-                "is_perfect": True
+                "is_perfect": True,
+                "is_triangular": True
             }
         )
 
@@ -22,7 +23,8 @@ class TestAnalyzeNumber(unittest.TestCase):
                 "sum_of_digits": 7,
                 "is_prime": True,
                 "is_odd": True,
-                "is_perfect": False
+                "is_perfect": False,
+                "is_triangular": False
             }
         )
 
@@ -36,9 +38,13 @@ class TestAnalyzeNumber(unittest.TestCase):
                 "sum_of_digits": 1,
                 "is_prime": False,
                 "is_odd": False,
-                "is_perfect": False
+                "is_perfect": False,
+                "is_triangular": True
             }
         )
+
+    def test_not_triangular_number_8(self):
+        self.assertFalse(analyze_number(8)["is_triangular"])
 
     def test_zero(self):
         self.assertEqual(
